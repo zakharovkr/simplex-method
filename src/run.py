@@ -6,6 +6,6 @@ try:
     test_simplex.solve()
 
 except ValueError as e:
-    print("Произошла ошибка:", e)
+    print("Произошла ошибка: ", e)
 
 
