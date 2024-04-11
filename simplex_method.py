@@ -28,6 +28,7 @@ class SimplexMethod:
                 self.d.append(dot(basic, get_col(self.simplex_table, i)))
             else:
                 self.d.append(dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+
     def simplex_recalculation(self, lead_element_row, lead_element_col):
 
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
@@ -70,21 +71,20 @@ class SimplexMethod:
             self.simplex_recalculation(lead_element_row, lead_element_col)
 
     def ouput_result(self):
-        print("Y(X^*) =", round(self.d[0], 2))
+        print("Y(X*) =", round(self.d[0], 2))
 
         if 0 in self.basic_vars:
-            print("X1 =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(0)], 2))
+            print("X₁ =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(0)], 2))
         else:
-            print("X1 = 0")
+            print("X₁ = 0")
 
         if 1 in self.basic_vars:
-            print("X2 =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(1)], 2) )
+            print("X₂ =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(1)], 2) )
         else:
-            print("X2 = 0")
+            print("X₂ = 0")
 
     def solve(self):
         self.add_basis()
         self.init_simplex_table()
         self.simplex_calculation()
         self.ouput_result()
-

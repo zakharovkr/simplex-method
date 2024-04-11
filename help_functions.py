@@ -16,3 +16,21 @@ def print_simplex(self):
         print(*i)
     print(*self.d, )
     print("\n")
+
+
+def read_function(filename):
+    prices = []
+    norms = []
+    limit = []
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        prices = list(map(int, lines[1].strip().split()))
+
+        norm_start_index = lines.index("Коэффициенты уравнений\n") + 1
+        norm_end_index = lines.index("Коэффициенты ограничений\n")
+        for line in lines[norm_start_index: norm_end_index]:
+            norm = list(map(int, line.strip().split()))
+            if len(norm) != 0: norms.append(norm)
+        limit = list(map(int, lines[norm_end_index + 1].strip().split()))
+
+    return prices, norms, limit
