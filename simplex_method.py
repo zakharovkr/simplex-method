@@ -22,6 +22,19 @@ class SimplexMethod:
         if any(len(row) != first_length for row in self.A[1:]):
             raise ValueError("Не хватает переменных")
 
+    def print_simplex(self):
+        # print(*self.c, "-> min")
+        # for i, j in zip(self.A, self.b):
+        #     print(*i, "<=", j)
+
+        print("Не базисные переменные: (индексы)", *self.non_basic_vars)
+        print("Базисные переменные: (индексы)", *self.basic_vars)
+        print("Сиплекс таблица:")
+
+        for i in self.simplex_table:
+            print(*i)
+        print(*self.d, )
+        print("\n")
     def delta_calculation(self):
         basic = []
         for i in self.basic_vars:

@@ -4,9 +4,6 @@ def dot(vec1, vec2):
 def get_col(matrix, i):
     return [row[i] for row in matrix]
 
-
-
-
 def read_function(filename):
     prices = []
     norms = []
