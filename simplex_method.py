@@ -18,6 +18,12 @@ class SimplexMethod:
             if i < 0:
                 raise ValueError("Все коэффициенты должны быть больше 0")
 
+        first_length = len(self.A[0])
+        if any(len(row) != first_length for row in self.A[1:]):
+            raise ValueError("Не хватает переменных")
+
+
+
     def delta_calculation(self):
         basic = []
         for i in self.basic_vars:
@@ -65,23 +71,30 @@ class SimplexMethod:
 
         while any(delta > 0 for delta in self.d[1:]):
             lead_element_col = self.d[1:].index(max(delta for delta in self.d[1:])) + 1
-            lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
-                                   key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
+            try:
+                lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
+                                        key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
+                self.simplex_recalculation(lead_element_row, lead_element_col)
 
-            self.simplex_recalculation(lead_element_row, lead_element_col)
+            except ValueError:
+                print("Простанство допустимых решений неограничено")
+                sys.exit()
+
+
 
     def ouput_result(self):
         print("Y(X*) =", round(self.d[0], 2))
 
-        if 0 in self.basic_vars:
-            print("X₁ =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(0)], 2))
-        else:
-            print("X₁ = 0")
+        n = []
+        for i, j in enumerate(self.c):
+            if j != 0:
+                n.append(i)
+        for i in n:
+            if i in self.basic_vars:
+                print(f"X{(i + 1)} = {round(get_col(self.simplex_table, 0)[self.basic_vars.index(i)], 2)}")
+            else:
+                print(f"X{i + 1} = 0")
 
-        if 1 in self.basic_vars:
-            print("X₂ =", round(get_col(self.simplex_table, 0)[self.basic_vars.index(1)], 2) )
-        else:
-            print("X₂ = 0")
 
     def solve(self):
         self.add_basis()

@@ -1,3 +1,4 @@
+import sys
 def dot(vec1, vec2):
     return sum(x * y for x, y in zip(vec1, vec2))
 def get_col(matrix, i):
@@ -34,3 +35,4 @@ def read_function(filename):
         limit = list(map(int, lines[norm_end_index + 1].strip().split()))
 
     return prices, norms, limit
+
