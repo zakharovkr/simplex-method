@@ -1,5 +1,4 @@
-from data import *
-
+from help_functions import *
 class SimplexMethod:
     def __init__(self, A, b, c):
         self.A = A
@@ -19,23 +18,18 @@ class SimplexMethod:
             if i < 0:
                 raise ValueError("Все коэффициенты должны быть больше 0")
 
-    def print_simplex(self):
-        print(*self.c, "-> min")
-        for i, j in zip(self.A, self.b):
-            print(*i, "<=", j)
+    def delta_calculation(self):
+        basic = []
+        for i in self.basic_vars:
+            basic.append(self.c[i])
 
-        print("Не базисные переменные: (индексы)", *self.non_basic_vars)
-        print("Базисные переменные: (индексы)", *self.basic_vars)
-        print("Сиплекс таблица:")
+        for i in range(len(self.basic_vars) + len(self.non_basic_vars) + 1):
+            if i == 0:
+                self.d.append(dot(basic, get_col(self.simplex_table, i)))
+            else:
+                self.d.append(dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+    def simplex_recalculation(self, lead_element_row, lead_element_col):
 
-        for i in self.simplex_table:
-            print(*i)
-        print(*self.d, )
-        print("\n")
-
-    def recalculation(self, lead_element_row, lead_element_col):
-        print("До пересчета")
-        self.print_simplex()
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
         self.simplex_table[lead_element_row] = [element / lead_element_element
                                                 for element in self.simplex_table[lead_element_row]]
@@ -49,20 +43,8 @@ class SimplexMethod:
         self.basic_vars[lead_element_row] = lead_element_col - 1
         self.non_basic_vars[lead_element_col - 1] = lead_element_row
 
-        basic = []
         self.d = []
-        for i in self.basic_vars:
-            basic.append(self.c[i])
-
-        for i in range(len(self.basic_vars) + len(self.non_basic_vars) + 1):
-            if i == 0:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)))
-            else:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
-
-        print("После пересчета")
-        self.print_simplex()
-        # time.sleep(5)
+        self.delta_calculation()
 
     def add_basis(self):
         self.c += [0] * len(self.A)
@@ -77,22 +59,15 @@ class SimplexMethod:
         for i, j in enumerate(self.simplex_table):
             j.insert(0, (self.b[i]))
 
-        basic = []
-        for i in self.basic_vars:
-            basic.append(self.c[i])
-
-        for i in range(len(self.basic_vars) + len(self.non_basic_vars) + 1):
-            if i == 0:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)))
-            else:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+    def simplex_calculation(self):
+        self.delta_calculation()
 
         while any(delta > 0 for delta in self.d[1:]):
             lead_element_col = self.d[1:].index(max(delta for delta in self.d[1:])) + 1
             lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
                                    key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
 
-            self.recalculation(lead_element_row, lead_element_col)
+            self.simplex_recalculation(lead_element_row, lead_element_col)
 
     def ouput_result(self):
         print("Y(X^*) =", round(self.d[0], 2))
@@ -110,17 +85,6 @@ class SimplexMethod:
     def solve(self):
         self.add_basis()
         self.init_simplex_table()
-
+        self.simplex_calculation()
         self.ouput_result()
 
-
-def dot(vec1, vec2):
-    return sum(x * y for x, y in zip(vec1, vec2))
-
-
-def get_col(matrix, i):
-    return [row[i] for row in matrix]
-
-
-test_simplex = SimplexMethod(norms, limit, prices)
-test_simplex.solve()
