@@ -22,8 +22,6 @@ class SimplexMethod:
         if any(len(row) != first_length for row in self.A[1:]):
             raise ValueError("Не хватает переменных")
 
-
-
     def delta_calculation(self):
         basic = []
         for i in self.basic_vars:
@@ -81,7 +79,6 @@ class SimplexMethod:
                 sys.exit()
 
 
-
     def ouput_result(self):
         print("Y(X*) =", round(self.d[0], 2))
 
@@ -94,7 +91,6 @@ class SimplexMethod:
                 print(f"X{(i + 1)} = {round(get_col(self.simplex_table, 0)[self.basic_vars.index(i)], 2)}")
             else:
                 print(f"X{i + 1} = 0")
-
 
     def solve(self):
         self.add_basis()
