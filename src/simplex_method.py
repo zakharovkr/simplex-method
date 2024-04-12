@@ -1,10 +1,12 @@
 from help_functions import *
+from time import *
 class SimplexMethod:
     def __init__(self, A, b, c):
         self.A = A
         self.b = b
         self.c = c
         self.d = []
+        self.dw = []
         self.basic_vars = []
         self.non_basic_vars = []
         self.simplex_table = []
@@ -23,26 +25,32 @@ class SimplexMethod:
             raise ValueError("Не хватает переменных")
 
     def print_simplex(self):
-        # print(*self.c, "-> min")
+
         # for i, j in zip(self.A, self.b):
         #     print(*i, "<=", j)
 
         print("Не базисные переменные: (индексы)", *self.non_basic_vars)
-        print("Базисные переменные: (индексы)", *self.basic_vars)
+
+        print("Коэффициенты:")
+        print(*self.c, "-> min")
         print("Сиплекс таблица:")
 
         for i in self.simplex_table:
             print(*i)
-        print(*self.d, )
-        print("\n")
 
+        print("\nомеги", *self.dw)
+        print("св.чл ", *self.d )
+
+        print("Базисные переменные: (индексы)", *self.basic_vars)
     def add_basis(self):
         self.c += [0] * len(self.A)
-        self.A = [row + [0] * i + [1] + [0] * (len(self.b) - i - 1) for i, row in enumerate(self.A)]
+        self.c += ['w'] * len(self.A)
+        self.A = [row + [0] * i + [-1] + [0] * (len(self.b) - i - 1) for i, row in enumerate(self.A)]
+        self.A = [row + [0] * i + ['1'] + [0] * (len(self.b) - i - 1) for i, row in enumerate(self.A)]
 
     def init_simplex_table(self):
-        self.non_basic_vars = list(range(self.n))
-        self.basic_vars = list(range(self.n, self.n + self.m))
+        self.non_basic_vars = list(range(len(self.c) - len(self.b)))
+        self.basic_vars = list(range(len(self.c) - len(self.b), len(self.c)))
 
         self.simplex_table = self.A
 
@@ -51,29 +59,32 @@ class SimplexMethod:
 
     def delta_calculation(self):
         basic = []
+        # print("^^^^^^",self.dw)
         for i in self.basic_vars:
             basic.append(self.c[i])
-
-        #delta[i] = ( C^T, B^-1 P[i] ) - c[i]
         for i in range(len(self.basic_vars) + len(self.non_basic_vars) + 1):
-            self.d.append(dot(basic, get_col(self.simplex_table, i)) if i == 0 else dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+            if i == 0: a, b = dot_extended(basic, get_col(self.simplex_table, i), 0)
+            else: a, b = dot_extended(basic, get_col(self.simplex_table, i), self.c[i - 1])
+            # print(self.dw)
+            self.dw.append(a)
+            self.d.append(b)
+        # print(self.dw)
 
 
 
-    def simplex_calculation(self):
-        self.delta_calculation()
+    def search_lead_element(self):
+        # self.delta_calculation()
+        while any(delta > 0 for delta in self.dw[1:len(self.basic_vars) + len(self.non_basic_vars) + 1]):
+            lead_element_col = self.dw[1:len(self.basic_vars) + len(self.non_basic_vars) + 1].index(max(delta for delta in self.dw[1:len(self.basic_vars) + len(self.non_basic_vars) + 1])) + 1
+            # print(lead_element_col)
+            # print(self.dw[1: len(self.basic_vars) + len(self.non_basic_vars) + 1])
 
-        while any(delta > 0 for delta in self.d[1:]):
-            #tetta[i][j]  = min ( ksi[i][0] / ksi[i][j] )
-            lead_element_col = self.d[1:].index(max(delta for delta in self.d[1:])) + 1
-            try:
-                lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
-                                        key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
-                self.simplex_recalculation(lead_element_row, lead_element_col)
+            lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
+                                    key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
 
-            except ValueError:
-                print("Простанство допустимых решений неограничено")
-                sys.exit()
+            print(self.simplex_table[lead_element_row][lead_element_col])
+            # self.simplex_recalculation(lead_element_row, lead_element_col)
+            sleep(5)
 
     def simplex_recalculation(self, lead_element_row, lead_element_col):
 
@@ -109,5 +120,8 @@ class SimplexMethod:
     def solve(self):
         self.add_basis()
         self.init_simplex_table()
-        self.simplex_calculation()
-        self.ouput_result()
+        self.delta_calculation()
+        self.print_simplex()
+        self.search_lead_element()
+        # self.ouput_result()
+
