@@ -35,16 +35,45 @@ class SimplexMethod:
             print(*i)
         print(*self.d, )
         print("\n")
+
+    def add_basis(self):
+        self.c += [0] * len(self.A)
+        self.A = [row + [0] * i + [1] + [0] * (len(self.b) - i - 1) for i, row in enumerate(self.A)]
+
+    def init_simplex_table(self):
+        self.non_basic_vars = list(range(self.n))
+        self.basic_vars = list(range(self.n, self.n + self.m))
+
+        self.simplex_table = self.A
+
+        for i, j in enumerate(self.simplex_table):
+            j.insert(0, (self.b[i]))
+
     def delta_calculation(self):
         basic = []
         for i in self.basic_vars:
             basic.append(self.c[i])
 
+        #delta[i] = ( C^T, B^-1 P[i] ) - c[i]
         for i in range(len(self.basic_vars) + len(self.non_basic_vars) + 1):
-            if i == 0:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)))
-            else:
-                self.d.append(dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+            self.d.append(dot(basic, get_col(self.simplex_table, i)) if i == 0 else dot(basic, get_col(self.simplex_table, i)) - self.c[i - 1])
+
+
+
+    def simplex_calculation(self):
+        self.delta_calculation()
+
+        while any(delta > 0 for delta in self.d[1:]):
+            #tetta[i][j]  = min ( ksi[i][0] / ksi[i][j] )
+            lead_element_col = self.d[1:].index(max(delta for delta in self.d[1:])) + 1
+            try:
+                lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
+                                        key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
+                self.simplex_recalculation(lead_element_row, lead_element_col)
+
+            except ValueError:
+                print("Простанство допустимых решений неограничено")
+                sys.exit()
 
     def simplex_recalculation(self, lead_element_row, lead_element_col):
 
@@ -63,34 +92,6 @@ class SimplexMethod:
 
         self.d = []
         self.delta_calculation()
-
-    def add_basis(self):
-        self.c += [0] * len(self.A)
-        self.A = [row + [0] * i + [1] + [0] * (len(self.b) - i - 1) for i, row in enumerate(self.A)]
-
-    def init_simplex_table(self):
-        self.non_basic_vars = list(range(self.n))
-        self.basic_vars = list(range(self.n, self.n + self.m))
-
-        self.simplex_table = self.A
-
-        for i, j in enumerate(self.simplex_table):
-            j.insert(0, (self.b[i]))
-
-    def simplex_calculation(self):
-        self.delta_calculation()
-
-        while any(delta > 0 for delta in self.d[1:]):
-            lead_element_col = self.d[1:].index(max(delta for delta in self.d[1:])) + 1
-            try:
-                lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
-                                        key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
-                self.simplex_recalculation(lead_element_row, lead_element_col)
-
-            except ValueError:
-                print("Простанство допустимых решений неограничено")
-                sys.exit()
-
 
     def ouput_result(self):
         print("Y(X*) =", round(self.d[0], 2))
