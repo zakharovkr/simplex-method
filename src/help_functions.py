@@ -5,9 +5,9 @@ def dot_extended(vec1, vec2, c_value):
     w_value = []
     for i, j in zip(vec1, vec2):
         if i == 'w':
-            w_value.append(float(j))
+            w_value.append(round(float(j), 1))
         if i != 'w':
-            d_value.append(float(i * j))
+            d_value.append(round(float(i * j), 1))
 
     a = sum(w_value)
     b = sum(d_value)
@@ -37,8 +37,3 @@ def read_function(filename):
         limit = list(map(int, lines[norm_end_index + 1].strip().split()))
 
     return prices, norms, limit
-
-
-# a = ['w','w','w','w' ]
-# b = [200, 2, 3, 4]
-# dot(a, b, 1)
