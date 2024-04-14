@@ -1,5 +1,6 @@
 from help_functions import *
-
+from decimal import Decimal
+from time import sleep
 class SimplexMethod:
     def __init__(self, A, b, c):
         self.A = A
@@ -26,18 +27,19 @@ class SimplexMethod:
             raise ValueError("Не хватает переменных")
 
     def print_simplex(self):
-        print(*self.c, "-> min")
         print("Сиплекс таблица:")
 
         for i in self.simplex_table:
             print(*i)
 
-        print("dw", *self.dw)
+        print("\ndw", *self.dw)
         print("d", *self.d )
 
-        print("Базисные переменные: (индексы)", *self.basic_vars)
-        print("\n")
+        print("\nБазисные переменные: ", end='')
+        for i in self.basic_vars:
+            print(i+1, end=' ')
 
+        print("\n")
     def add_basis(self):
         self.c += [0] * len(self.A)
         self.c += ['w'] * len(self.A)
@@ -64,26 +66,40 @@ class SimplexMethod:
             self.d.append(b)
 
     def search_lead_element(self):
+        count = 2
+        # print("Итерация № 1")
+        # self.print_simplex()
         while True:
-            d = self.d
-            lead_element_col = self.dw[1:].index(max(delta for delta in self.dw[1:])) + 1
+            delta1337 = self.dw[1:]
+            if not any(delta > 0 for delta in self.dw[1:]):
+                delta1337 = self.d[1:len(self.c) - len(self.A)]
+
+
+            lead_element_col = delta1337.index(max(delta for delta in delta1337)) + 1
             lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
                                     key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
 
             self.simplex_method(lead_element_row, lead_element_col)
-            if d == self.d:
+            # print("Итерация №", count)
+            # self.print_simplex()
+            # print("Ведуший элемент", self.simplex_table[lead_element_row][lead_element_col])
+            #
+            # count += 1
+            # sleep(1)
+
+            if delta1337 == self.d[1:len(self.c) - len(self.A)]:
                 break
 
     def simplex_method(self, lead_element_row, lead_element_col):
-
+        round_value = 2
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
-        self.simplex_table[lead_element_row] = [ round(element / lead_element_element, 1)
+        self.simplex_table[lead_element_row] = [Decimal(str(element / lead_element_element))
                                                 for element in self.simplex_table[lead_element_row]]
 
         for i in range(len(self.simplex_table)):
             if i != lead_element_row:
                 multiplier = self.simplex_table[i][lead_element_col]
-                self.simplex_table[i] = [round(self.simplex_table[i][j] - multiplier * self.simplex_table[lead_element_row][j], 1)
+                self.simplex_table[i] = [Decimal(str(self.simplex_table[i][j] - multiplier * self.simplex_table[lead_element_row][j]))
                                          for j in range(len(self.simplex_table[i]))]
 
         self.basic_vars[lead_element_row] = lead_element_col - 1
