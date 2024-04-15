@@ -89,6 +89,8 @@ class SimplexMethod:
 
             if delta == self.d[1:len(self.c) - len(self.A)]:
                 break
+            # if not any(delta > 0 for delta in self.dw[1:len(self.c) - len(self.A)]):
+            #     break
 
     def simplex_method(self, lead_element_row, lead_element_col):
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
@@ -122,7 +124,7 @@ class SimplexMethod:
             else:
                 result += f"X{i + 1} = 0; "
         result += ')'
-        print(result[:len(result) - 3] + ")")
+        print(result[:len(result) - len(self.A)] + ")")
 
     def solve(self, round_value = 2):
         self.add_basis()
