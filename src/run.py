@@ -1,11 +1,10 @@
 from simplex_method import *
 
-try:
-    prices, norms, limit = read_function('../data/data.txt')
-    test_simplex = SimplexMethod(norms, limit, prices)
-    test_simplex.solve()
 
-except ValueError as e:
-    print("Произошла ошибка: ", e)
+prices, norms, limit = read_function('../data/data.txt')
+test_simplex = SimplexMethod(norms, limit, prices)
+test_simplex.solve(2) #solve(3)  округляет до 3 знаков после запятой
+
+
 
 

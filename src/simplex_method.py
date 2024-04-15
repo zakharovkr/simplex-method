@@ -66,32 +66,31 @@ class SimplexMethod:
             self.d.append(b)
 
     def search_lead_element(self):
-        count = 2
+        # count = 2
         # print("Итерация № 1")
         # self.print_simplex()
+
         while True:
-            delta1337 = self.dw[1:]
+            delta = self.dw[1:]
             if not any(delta > 0 for delta in self.dw[1:]):
-                delta1337 = self.d[1:len(self.c) - len(self.A)]
+                delta = self.d[1:len(self.c) - len(self.A)]
 
 
-            lead_element_col = delta1337.index(max(delta for delta in delta1337)) + 1
+            lead_element_col = delta.index(max(delta for delta in delta)) + 1
             lead_element_row = min([i for i in range(self.m) if self.simplex_table[i][lead_element_col] > 0],
                                     key=lambda i: self.simplex_table[i][0] / self.simplex_table[i][lead_element_col])
 
             self.simplex_method(lead_element_row, lead_element_col)
+
             # print("Итерация №", count)
             # self.print_simplex()
-            # print("Ведуший элемент", self.simplex_table[lead_element_row][lead_element_col])
-            #
             # count += 1
             # sleep(1)
 
-            if delta1337 == self.d[1:len(self.c) - len(self.A)]:
+            if delta == self.d[1:len(self.c) - len(self.A)]:
                 break
 
     def simplex_method(self, lead_element_row, lead_element_col):
-        round_value = 2
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
         self.simplex_table[lead_element_row] = [Decimal(str(element / lead_element_element))
                                                 for element in self.simplex_table[lead_element_row]]
@@ -107,22 +106,27 @@ class SimplexMethod:
         self.d = []
         self.dw = []
         self.delta_calculation()
-    def ouput_result(self):
-        print("Y(X*) =", round(self.d[0], 2))
+
+    def ouput_result(self, round_value):
+        print("Y(X*) =", round(self.d[0], round_value))
 
         n = []
         for i, j in enumerate(self.c):
             if j != 0 and j != 'w':
                 n.append(i)
+        result = "X* = ("
         for i in n:
             if i in self.basic_vars:
-                print(f"X{(i + 1)} = {round(get_col(self.simplex_table, 0)[self.basic_vars.index(i)], 2)}")
-            else:
-                print(f"X{i + 1} = 0")
+                result += f"X{(i + 1)} = {round(get_col(self.simplex_table, 0)[self.basic_vars.index(i)], round_value)}; "
 
-    def solve(self):
+            else:
+                result += f"X{i + 1} = 0; "
+        result += ')'
+        print(result[:len(result) - 3] + ")")
+
+    def solve(self, round_value = 2):
         self.add_basis()
         self.init_simplex_table()
         self.delta_calculation()
         self.search_lead_element()
-        self.ouput_result()
+        self.ouput_result(round_value)
