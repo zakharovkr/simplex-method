@@ -1,5 +1,4 @@
 from help_functions import *
-from decimal import Decimal
 from time import sleep
 class SimplexMethod:
     def __init__(self, A, b, c):
@@ -85,22 +84,21 @@ class SimplexMethod:
             # print("Итерация №", count)
             # self.print_simplex()
             # count += 1
+
             # sleep(1)
 
             if delta == self.d[1:len(self.c) - len(self.A)]:
                 break
-            # if not any(delta > 0 for delta in self.dw[1:len(self.c) - len(self.A)]):
-            #     break
 
     def simplex_method(self, lead_element_row, lead_element_col):
         lead_element_element = self.simplex_table[lead_element_row][lead_element_col]
-        self.simplex_table[lead_element_row] = [Decimal(str(element / lead_element_element))
+        self.simplex_table[lead_element_row] = [element / lead_element_element
                                                 for element in self.simplex_table[lead_element_row]]
 
         for i in range(len(self.simplex_table)):
             if i != lead_element_row:
                 multiplier = self.simplex_table[i][lead_element_col]
-                self.simplex_table[i] = [Decimal(str(self.simplex_table[i][j] - multiplier * self.simplex_table[lead_element_row][j]))
+                self.simplex_table[i] = [self.simplex_table[i][j] - multiplier * self.simplex_table[lead_element_row][j]
                                          for j in range(len(self.simplex_table[i]))]
 
         self.basic_vars[lead_element_row] = lead_element_col - 1
@@ -132,3 +130,4 @@ class SimplexMethod:
         self.delta_calculation()
         self.search_lead_element()
         self.ouput_result(round_value)
+

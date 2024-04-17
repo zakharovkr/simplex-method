@@ -1,22 +1,22 @@
 import sys
-from decimal import Decimal
+
 
 def dot_extended(vec1, vec2, c_value):
     d_value = []
     w_value = []
     for i, j in zip(vec1, vec2):
         if i == 'w':
-            w_value.append(Decimal(str(j)))
+            w_value.append(j)
         if i != 'w':
-            d_value.append(Decimal(str(i)) * Decimal(str(j)))
+            d_value.append(i * j)
 
     a = sum(w_value)
     b = sum(d_value)
 
     if c_value == 'w':
-        a -= Decimal('1')
+        a -= 1
     else:
-        b -= Decimal(str(c_value))
+        b -= c_value
     return a, b
 
 
