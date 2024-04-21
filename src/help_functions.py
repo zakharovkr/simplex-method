@@ -1,5 +1,19 @@
 import sys
 
+def dot(vec1, vec2):
+    return sum(i * j for i, j in zip(vec1, vec2))
+
+
+def multiply_matrix(matrix1, matrix2):
+    result = []
+    for i in range(len(matrix1)):
+        row = []
+        for j in range(len(matrix2[0])):
+            row.append(dot(matrix1[i], [matrix2[k][j] for k in range(len(matrix2))]))
+        result.append(row)
+
+    return result
+
 
 def dot_extended(vec1, vec2, c_value):
     d_value = []
